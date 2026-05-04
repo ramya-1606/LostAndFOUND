@@ -197,9 +197,9 @@ import os
 app = Flask(__name__)
 
 # ✅ Initialize DB safely (Flask 3 compatible)
-with app.app_context():
-    try:
-        init_db()
-    except Exception as e:
-        print("DB init error:", e)
+# with app.app_context(): 
+   # try:
+     #   init_db()
+   # except Exception as e:
+      #  print("DB init error:", e)
     
