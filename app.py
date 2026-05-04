@@ -198,6 +198,7 @@ def reopen_item(item_id):
     flash('Item reopened.', 'success')
     return redirect(url_for('item_detail', item_id=item_id, token=token))
 
-if __name__ == "__main__":
+@app.before_first_request
+def setup():
     init_db()
     
