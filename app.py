@@ -93,14 +93,7 @@ def save_image(file):
 
 @app.route('/')
 def index():
-    db = get_db()
-    recent_lost  = [row_to_dict(r) for r in db.execute(
-        "SELECT * FROM item WHERE type='lost' AND status='open' ORDER BY date_reported DESC LIMIT 4").fetchall()]
-    recent_found = [row_to_dict(r) for r in db.execute(
-        "SELECT * FROM item WHERE type='found' AND status='open' ORDER BY date_reported DESC LIMIT 4").fetchall()]
-    total_open     = db.execute("SELECT COUNT(*) FROM item WHERE status='open'").fetchone()[0]
-    total_resolved = db.execute("SELECT COUNT(*) FROM item WHERE status='resolved'").fetchone()[0]
-    return render_template('index.html',
+    return "APP IS RUNNING"
         recent_lost=recent_lost, recent_found=recent_found,
         total_open=total_open, total_resolved=total_resolved, cat_emoji=CAT_EMOJI)
 
@@ -198,8 +191,15 @@ def reopen_item(item_id):
     flash('Item reopened.', 'success')
     return redirect(url_for('item_detail', item_id=item_id, token=token))
 
+from flask import Flask
+import os
+
 app = Flask(__name__)
 
+# ✅ Initialize DB safely (Flask 3 compatible)
 with app.app_context():
-    init_db()
+    try:
+        init_db()
+    except Exception as e:
+        print("DB init error:", e)
     
