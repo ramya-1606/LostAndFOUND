@@ -1,0 +1,233 @@
+{% extends "base.html" %}
+{% block title %}FindIt — College Lost & Found Portal{% endblock %}
+
+{% block head %}
+<style>
+  .hero {
+    text-align: center;
+    padding: 4rem 1rem 3rem;
+  }
+  .hero-tag {
+    display: inline-block;
+    background: var(--lavender);
+    color: var(--lavender-deep);
+    font-size: 0.8rem; font-weight: 600;
+    padding: 4px 16px; border-radius: 20px;
+    letter-spacing: .06em; text-transform: uppercase;
+    margin-bottom: 1rem;
+  }
+  .hero h1 {
+    font-family: 'Fraunces', serif;
+    font-size: clamp(2.2rem, 6vw, 3.8rem);
+    font-weight: 600; line-height: 1.15;
+    color: var(--ink); margin-bottom: 1rem;
+  }
+  .hero h1 em { font-style: italic; color: var(--lavender-deep); }
+  .hero p {
+    color: var(--ink-soft); font-size: 1.05rem;
+    max-width: 480px; margin: 0 auto 2rem;
+    line-height: 1.7;
+  }
+  .hero-actions { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+
+  /* SEARCH BAR */
+  .search-bar {
+    max-width: 520px; margin: 0 auto 3rem;
+    display: flex; gap: 0;
+    background: white;
+    border: 1.5px solid var(--border);
+    border-radius: 50px;
+    box-shadow: var(--shadow);
+    overflow: hidden;
+  }
+  .search-bar input {
+    flex: 1; border: none; padding: 14px 20px;
+    background: transparent; font-size: 0.95rem;
+    border-radius: 0;
+  }
+  .search-bar input:focus { box-shadow: none; }
+  .search-bar button {
+    background: var(--ink); color: white;
+    border: none; padding: 12px 24px;
+    border-radius: 50px; cursor: pointer;
+    font-weight: 600; font-size: 0.9rem;
+    font-family: 'DM Sans', sans-serif;
+    transition: background .2s;
+  }
+  .search-bar button:hover { background: var(--lavender-deep); }
+
+  /* STATS */
+  .stats { display: flex; justify-content: center; gap: 2rem; margin-bottom: 3rem; flex-wrap: wrap; }
+  .stat {
+    text-align: center;
+    background: white; border: 1.5px solid var(--border);
+    border-radius: var(--radius-md); padding: 1.25rem 2rem;
+    box-shadow: var(--shadow);
+  }
+  .stat-num {
+    font-family: 'Fraunces', serif;
+    font-size: 2.2rem; font-weight: 600; line-height: 1;
+  }
+  .stat-num.open { color: var(--sky-deep); }
+  .stat-num.resolved { color: var(--mint-deep); }
+  .stat-label { font-size: 0.8rem; color: var(--ink-soft); margin-top: 4px; font-weight: 500; }
+
+  /* SECTIONS */
+  .section-header {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 1.25rem;
+  }
+  .section-title {
+    font-family: 'Fraunces', serif;
+    font-size: 1.4rem; font-weight: 600;
+    display: flex; align-items: center; gap: 10px;
+  }
+  .section-pill {
+    font-size: 0.72rem; font-weight: 600; text-transform: uppercase;
+    padding: 3px 10px; border-radius: 20px; letter-spacing: .04em;
+  }
+  .pill-lost  { background: var(--rose);  color: #8b2222; }
+  .pill-found { background: var(--mint);  color: #1e5c38; }
+  .see-all { font-size: 0.85rem; font-weight: 600; color: var(--lavender-deep); text-decoration: none; }
+  .see-all:hover { text-decoration: underline; }
+
+  /* ITEM GRID */
+  .item-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 1rem; margin-bottom: 3rem; }
+  .item-card {
+    background: white; border: 1.5px solid var(--border);
+    border-radius: var(--radius-md); overflow: hidden;
+    box-shadow: var(--shadow); transition: all .2s;
+    text-decoration: none; color: inherit; display: block;
+  }
+  .item-card:hover { transform: translateY(-4px); box-shadow: var(--shadow-hover); }
+  .item-card-img {
+    width: 100%; height: 140px; object-fit: cover;
+    background: var(--surface); display: flex; align-items: center;
+    justify-content: center; font-size: 3rem;
+  }
+  .item-card-img img { width: 100%; height: 100%; object-fit: cover; }
+  .item-card-body { padding: 1rem; }
+  .item-card-title { font-weight: 600; margin: 6px 0 4px; font-size: 0.95rem; line-height: 1.3; }
+  .item-card-meta { font-size: 0.78rem; color: var(--ink-soft); display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+
+  .empty-state {
+    text-align: center; padding: 2rem; color: var(--ink-soft);
+    background: white; border: 1.5px dashed var(--border);
+    border-radius: var(--radius-md); font-size: 0.9rem;
+  }
+
+  /* CTA BANNER */
+  .cta-banner {
+    background: linear-gradient(135deg, var(--lavender) 0%, var(--blush) 100%);
+    border: 1.5px solid var(--lavender);
+    border-radius: var(--radius-lg); padding: 3rem 2rem;
+    text-align: center; margin-top: 1rem;
+  }
+  .cta-banner h2 { font-family: 'Fraunces', serif; font-size: 1.8rem; margin-bottom: .5rem; }
+  .cta-banner p { color: var(--ink-soft); margin-bottom: 1.5rem; }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="hero fade-up">
+  <div class="hero-tag">🎓 College Lost & Found</div>
+  <h1>Lost something? Found<br><em>something?</em> We've got you.</h1>
+  <p>A simple portal to help our campus community reunite people with their belongings.</p>
+
+  <form action="{{ url_for('items') }}" method="get" style="margin-bottom: 2rem;">
+    <div class="search-bar">
+      <input type="text" name="search" placeholder="Search for keys, wallet, phone…">
+      <button type="submit">Search</button>
+    </div>
+  </form>
+
+  <div class="hero-actions">
+    <a href="{{ url_for('post_item') }}" class="btn btn-primary">+ Post an Item</a>
+    <a href="{{ url_for('items') }}" class="btn btn-ghost">Browse All</a>
+  </div>
+</div>
+
+<div class="stats fade-up-2">
+  <div class="stat">
+    <div class="stat-num open">{{ total_open }}</div>
+    <div class="stat-label">Items Active</div>
+  </div>
+  <div class="stat">
+    <div class="stat-num resolved">{{ total_resolved }}</div>
+    <div class="stat-label">Items Reunited 🎉</div>
+  </div>
+</div>
+
+<div class="fade-up-3">
+  <!-- LOST -->
+  <div class="section-header">
+    <div class="section-title">
+      Recent Lost Items
+      <span class="section-pill pill-lost">Lost</span>
+    </div>
+    <a href="{{ url_for('items', type='lost') }}" class="see-all">See all →</a>
+  </div>
+  <div class="item-grid">
+    {% for item in recent_lost %}
+      <a href="{{ url_for('item_detail', item_id=item['id']) }}" class="item-card">
+        <div class="item-card-img">
+          {% if item['image_filename'] %}
+            <img src="{{ url_for('static', filename='uploads/' + item['image_filename']) }}" alt="{{ item['title'] }}">
+          {% else %}
+            {{ {'Electronics':'📱','Clothing & Accessories':'👗','ID Cards & Documents':'🪪','Keys':'🔑','Bags & Wallets':'👝','Books & Stationery':'📚','Sports Equipment':'⚽','Other':'📦'}.get(item['category'], '📦') }}
+          {% endif %}
+        </div>
+        <div class="item-card-body">
+          <span class="badge badge-lost">Lost</span>
+          <div class="item-card-title">{{ item['title'] }}</div>
+          <div class="item-card-meta">
+            <span>📍 {{ item['location'] }}</span>
+            <span>· {{ item['time_ago'] }}</span>
+          </div>
+        </div>
+      </a>
+    {% else %}
+      <div class="empty-state" style="grid-column:1/-1">No lost items posted yet.</div>
+    {% endfor %}
+  </div>
+
+  <!-- FOUND -->
+  <div class="section-header">
+    <div class="section-title">
+      Recent Found Items
+      <span class="section-pill pill-found">Found</span>
+    </div>
+    <a href="{{ url_for('items', type='found') }}" class="see-all">See all →</a>
+  </div>
+  <div class="item-grid">
+    {% for item in recent_found %}
+      <a href="{{ url_for('item_detail', item_id=item['id']) }}" class="item-card">
+        <div class="item-card-img">
+          {% if item['image_filename'] %}
+            <img src="{{ url_for('static', filename='uploads/' + item['image_filename']) }}" alt="{{ item['title'] }}">
+          {% else %}
+            {{ {'Electronics':'📱','Clothing & Accessories':'👗','ID Cards & Documents':'🪪','Keys':'🔑','Bags & Wallets':'👝','Books & Stationery':'📚','Sports Equipment':'⚽','Other':'📦'}.get(item['category'], '📦') }}
+          {% endif %}
+        </div>
+        <div class="item-card-body">
+          <span class="badge badge-found">Found</span>
+          <div class="item-card-title">{{ item['title'] }}</div>
+          <div class="item-card-meta">
+            <span>📍 {{ item['location'] }}</span>
+            <span>· {{ item['time_ago'] }}</span>
+          </div>
+        </div>
+      </a>
+    {% else %}
+      <div class="empty-state" style="grid-column:1/-1">No found items posted yet.</div>
+    {% endfor %}
+  </div>
+
+  <!-- CTA -->
+  <div class="cta-banner">
+    <h2>Found something on campus?</h2>
+    <p>Post it here — someone's day will be so much better because of you.</p>
+    <a href="{{ url_for('post_item') }}" class="btn btn-primary">Post a Found Item</a>
+  </div>
+</div>
+{% endblock %}

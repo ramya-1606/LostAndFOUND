@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>{% block title %}FindIt — College Lost & Found{% endblock %}</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,400;0,600;1,400&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --rose:    #f7c5c5;
+      --peach:   #fde4ce;
+      --butter:  #fdf3c0;
+      --mint:    #c5ecd4;
+      --sky:     #c5dff8;
+      --lavender:#dcc5f7;
+      --blush:   #f9e0f0;
+
+      --rose-deep:    #e89898;
+      --mint-deep:    #7fcca0;
+      --sky-deep:     #7ab5e8;
+      --lavender-deep:#b08de8;
+
+      --ink:     #2d2535;
+      --ink-soft:#5a5168;
+      --surface: #fdfaf8;
+      --card:    #ffffff;
+      --border:  #ece6f0;
+
+      --radius-sm: 10px;
+      --radius-md: 16px;
+      --radius-lg: 24px;
+      --shadow: 0 2px 16px rgba(80,60,100,0.08);
+      --shadow-hover: 0 8px 32px rgba(80,60,100,0.14);
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: var(--surface);
+      color: var(--ink);
+      min-height: 100vh;
+      background-image:
+        radial-gradient(ellipse at 10% 10%, #f7c5c540 0%, transparent 50%),
+        radial-gradient(ellipse at 90% 80%, #c5ecd440 0%, transparent 50%),
+        radial-gradient(ellipse at 60% 30%, #c5dff820 0%, transparent 40%);
+    }
+
+    /* NAV */
+    nav {
+      background: rgba(255,255,255,0.85);
+      backdrop-filter: blur(12px);
+      border-bottom: 1.5px solid var(--border);
+      padding: 0 2rem;
+      position: sticky; top: 0; z-index: 100;
+    }
+    .nav-inner {
+      max-width: 1100px; margin: 0 auto;
+      display: flex; align-items: center; justify-content: space-between;
+      height: 64px;
+    }
+    .nav-logo {
+      font-family: 'Fraunces', serif;
+      font-size: 1.5rem; font-weight: 600;
+      color: var(--ink); text-decoration: none;
+      display: flex; align-items: center; gap: 8px;
+    }
+    .nav-logo span { font-style: italic; color: var(--lavender-deep); }
+    .nav-links { display: flex; align-items: center; gap: 8px; }
+    .nav-links a {
+      text-decoration: none; color: var(--ink-soft);
+      font-size: 0.9rem; font-weight: 500;
+      padding: 6px 14px; border-radius: 20px;
+      transition: all .2s;
+    }
+    .nav-links a:hover { background: var(--lavender); color: var(--ink); }
+    .btn-post {
+      background: var(--ink) !important;
+      color: #fff !important;
+      padding: 8px 20px !important;
+      border-radius: 20px !important;
+    }
+    .btn-post:hover { background: var(--lavender-deep) !important; color: #fff !important; }
+
+    /* FLASH */
+    .flash-wrap { max-width: 1100px; margin: 1rem auto; padding: 0 2rem; }
+    .flash {
+      padding: 12px 20px; border-radius: var(--radius-sm);
+      font-size: 0.9rem; font-weight: 500; margin-bottom: 8px;
+    }
+    .flash.success { background: var(--mint); color: #2a6645; }
+    .flash.error   { background: var(--rose); color: #8b2222; }
+
+    /* MAIN */
+    main { max-width: 1100px; margin: 0 auto; padding: 2rem; }
+
+    /* CARDS */
+    .card {
+      background: var(--card);
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius-md);
+      box-shadow: var(--shadow);
+      transition: transform .2s, box-shadow .2s;
+      overflow: hidden;
+    }
+    .card:hover { transform: translateY(-3px); box-shadow: var(--shadow-hover); }
+
+    /* BADGES */
+    .badge {
+      display: inline-block; padding: 3px 12px;
+      border-radius: 20px; font-size: 0.75rem; font-weight: 600;
+      letter-spacing: .04em; text-transform: uppercase;
+    }
+    .badge-lost    { background: var(--rose);    color: #8b2222; }
+    .badge-found   { background: var(--mint);    color: #1e5c38; }
+    .badge-open    { background: var(--sky);     color: #1a4a7a; }
+    .badge-resolved{ background: var(--butter);  color: #7a5f00; }
+
+    /* BUTTONS */
+    .btn {
+      display: inline-block; padding: 10px 22px;
+      border-radius: 20px; font-size: 0.9rem; font-weight: 600;
+      cursor: pointer; border: none; text-decoration: none;
+      transition: all .2s; font-family: 'DM Sans', sans-serif;
+    }
+    .btn-primary { background: var(--ink); color: #fff; }
+    .btn-primary:hover { background: var(--lavender-deep); }
+    .btn-ghost {
+      background: transparent; color: var(--ink);
+      border: 1.5px solid var(--border);
+    }
+    .btn-ghost:hover { background: var(--lavender); border-color: var(--lavender); }
+    .btn-danger { background: var(--rose); color: #8b2222; }
+    .btn-danger:hover { background: var(--rose-deep); color: #fff; }
+    .btn-success { background: var(--mint); color: #1e5c38; }
+    .btn-success:hover { background: var(--mint-deep); color: #fff; }
+
+    /* FORMS */
+    .form-group { margin-bottom: 1.25rem; }
+    label { display: block; font-size: 0.85rem; font-weight: 600; margin-bottom: 6px; color: var(--ink-soft); }
+    input[type=text], input[type=email], input[type=tel],
+    textarea, select {
+      width: 100%; padding: 11px 16px;
+      border: 1.5px solid var(--border); border-radius: var(--radius-sm);
+      font-family: 'DM Sans', sans-serif; font-size: 0.95rem;
+      background: var(--surface); color: var(--ink);
+      transition: border-color .2s, box-shadow .2s;
+      outline: none;
+    }
+    input:focus, textarea:focus, select:focus {
+      border-color: var(--lavender-deep);
+      box-shadow: 0 0 0 3px var(--lavender);
+    }
+    textarea { resize: vertical; min-height: 100px; }
+
+    /* TYPE TOGGLE */
+    .type-toggle { display: flex; gap: 12px; margin-bottom: 1.5rem; }
+    .type-btn {
+      flex: 1; padding: 14px; border-radius: var(--radius-sm);
+      border: 2px solid var(--border); background: var(--surface);
+      cursor: pointer; text-align: center; transition: all .2s;
+      font-family: 'DM Sans', sans-serif;
+    }
+    .type-btn .icon { font-size: 1.8rem; display: block; margin-bottom: 4px; }
+    .type-btn .label { font-weight: 600; font-size: 0.95rem; }
+    .type-btn.active-lost  { border-color: var(--rose-deep); background: var(--rose); }
+    .type-btn.active-found { border-color: var(--mint-deep); background: var(--mint); }
+
+    /* FOOTER */
+    footer {
+      text-align: center; padding: 2.5rem;
+      color: var(--ink-soft); font-size: 0.85rem;
+      border-top: 1.5px solid var(--border); margin-top: 4rem;
+      background: rgba(255,255,255,0.6);
+    }
+
+    /* ANIMATIONS */
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(18px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    .fade-up { animation: fadeUp .5s ease both; }
+    .fade-up-2 { animation: fadeUp .5s .1s ease both; }
+    .fade-up-3 { animation: fadeUp .5s .2s ease both; }
+
+    /* RESPONSIVE */
+    @media (max-width: 640px) {
+      main { padding: 1rem; }
+      nav  { padding: 0 1rem; }
+    }
+  </style>
+  {% block head %}{% endblock %}
+</head>
+<body>
+  <nav>
+    <div class="nav-inner">
+      <a href="{{ url_for('index') }}" class="nav-logo">Find<span>It</span></a>
+      <div class="nav-links">
+        <a href="{{ url_for('items') }}">Browse</a>
+        <a href="{{ url_for('items', type='lost') }}">Lost</a>
+        <a href="{{ url_for('items', type='found') }}">Found</a>
+        <a href="{{ url_for('post_item') }}" class="btn-post">+ Post Item</a>
+      </div>
+    </div>
+  </nav>
+
+  {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+      <div class="flash-wrap">
+        {% for cat, msg in messages %}
+          <div class="flash {{ cat }}">{{ msg }}</div>
+        {% endfor %}
+      </div>
+    {% endif %}
+  {% endwith %}
+
+  <main>{% block content %}{% endblock %}</main>
+
+  <footer>
+    Made with 🌸 for our college community &nbsp;·&nbsp; FindIt Lost & Found Portal
+  </footer>
+</body>
+</html>

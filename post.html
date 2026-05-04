@@ -1,0 +1,259 @@
+{% extends "base.html" %}
+{% block title %}Post an Item — FindIt{% endblock %}
+
+{% block head %}
+<style>
+  .post-wrap {
+    max-width: 680px; margin: 0 auto;
+  }
+  .page-header { margin-bottom: 2rem; }
+  .page-header h1 { font-family: 'Fraunces', serif; font-size: 2rem; font-weight: 600; }
+  .page-header p { color: var(--ink-soft); margin-top: 6px; line-height: 1.6; }
+
+  /* TYPE SELECTOR */
+  .type-selector { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 2rem; }
+  .type-card {
+    border: 2px solid var(--border); border-radius: var(--radius-md);
+    padding: 1.5rem; cursor: pointer; text-align: center;
+    transition: all .2s; background: white; position: relative;
+  }
+  .type-card input[type=radio] {
+    position: absolute; opacity: 0; width: 0; height: 0;
+  }
+  .type-card .t-icon { font-size: 2.5rem; display: block; margin-bottom: 8px; }
+  .type-card .t-title { font-family: 'Fraunces', serif; font-size: 1.2rem; font-weight: 600; }
+  .type-card .t-desc  { font-size: 0.82rem; color: var(--ink-soft); margin-top: 4px; }
+
+  .type-card:hover { border-color: var(--lavender-deep); background: var(--lavender); }
+  .type-card.selected-lost  { border-color: var(--rose-deep); background: var(--rose); }
+  .type-card.selected-found { border-color: var(--mint-deep); background: var(--mint); }
+
+  /* FORM CARD */
+  .form-card {
+    background: white; border: 1.5px solid var(--border);
+    border-radius: var(--radius-lg); padding: 2rem;
+    box-shadow: var(--shadow); margin-bottom: 1.5rem;
+  }
+  .form-card h2 {
+    font-family: 'Fraunces', serif; font-size: 1.1rem;
+    margin-bottom: 1.25rem; padding-bottom: 10px;
+    border-bottom: 1.5px solid var(--border);
+    display: flex; align-items: center; gap: 8px;
+  }
+  .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+  @media(max-width:560px) { .form-row { grid-template-columns: 1fr; } }
+
+  /* IMAGE UPLOAD */
+  .upload-zone {
+    border: 2px dashed var(--border); border-radius: var(--radius-md);
+    padding: 2rem; text-align: center; cursor: pointer;
+    transition: all .2s; background: var(--surface); position: relative;
+  }
+  .upload-zone:hover { border-color: var(--lavender-deep); background: var(--lavender); }
+  .upload-zone.has-file { border-color: var(--mint-deep); background: var(--mint); }
+  .upload-zone input[type=file] {
+    position: absolute; inset: 0; opacity: 0; cursor: pointer; width: 100%; height: 100%;
+  }
+  .upload-icon { font-size: 2rem; display: block; margin-bottom: 6px; }
+  .upload-label { font-weight: 600; font-size: 0.9rem; }
+  .upload-hint  { font-size: 0.78rem; color: var(--ink-soft); margin-top: 4px; }
+  #preview-wrap { margin-top: 1rem; display: none; }
+  #preview-img  { max-height: 180px; border-radius: var(--radius-sm); border: 1.5px solid var(--border); }
+
+  /* SUBMIT */
+  .submit-row {
+    display: flex; align-items: center; justify-content: space-between;
+    gap: 1rem; flex-wrap: wrap;
+  }
+  .submit-note { font-size: 0.8rem; color: var(--ink-soft); flex: 1; }
+  .btn-submit {
+    background: var(--ink); color: white; padding: 13px 32px;
+    border-radius: 25px; font-size: 1rem; font-weight: 600;
+    border: none; cursor: pointer; font-family: 'DM Sans', sans-serif;
+    transition: all .2s; display: inline-flex; align-items: center; gap: 8px;
+  }
+  .btn-submit:hover { background: var(--lavender-deep); transform: translateY(-1px); }
+  .btn-submit:disabled { opacity: .6; cursor: not-allowed; transform: none; }
+
+  /* TIPS */
+  .tips-box {
+    background: var(--sky); border: 1.5px solid var(--sky-deep);
+    border-radius: var(--radius-md); padding: 1.25rem 1.5rem;
+    margin-bottom: 1.5rem; font-size: 0.88rem;
+  }
+  .tips-box h3 { font-weight: 700; margin-bottom: 8px; }
+  .tips-box ul { padding-left: 1.2rem; color: var(--ink-soft); display: flex; flex-direction: column; gap: 4px; }
+
+  /* TOKEN INFO */
+  .token-info {
+    background: var(--butter); border: 1.5px solid #e5d56a;
+    border-radius: var(--radius-md); padding: 1rem 1.25rem;
+    font-size: 0.85rem; display: flex; gap: 10px; align-items: flex-start;
+  }
+  .token-info .ti-icon { font-size: 1.3rem; flex-shrink: 0; }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="post-wrap">
+  <div class="page-header fade-up">
+    <h1>Post an Item</h1>
+    <p>Fill in the details below to post a lost or found item. Be as descriptive as possible to help with identification.</p>
+  </div>
+
+  <div class="token-info fade-up" style="margin-bottom:1.5rem">
+    <span class="ti-icon">🔐</span>
+    <div>
+      <strong>How resolving works:</strong> After posting, you'll get a unique link. Bookmark it — only that link lets you mark the item as resolved. No account needed!
+    </div>
+  </div>
+
+  <form method="post" enctype="multipart/form-data" id="post-form">
+
+    <!-- TYPE -->
+    <div class="type-selector fade-up">
+      <label class="type-card" id="card-lost">
+        <input type="radio" name="type" value="lost" required onchange="selectType('lost')">
+        <span class="t-icon">😟</span>
+        <span class="t-title">I Lost Something</span>
+        <span class="t-desc">Post details about something you've lost on campus</span>
+      </label>
+      <label class="type-card" id="card-found">
+        <input type="radio" name="type" value="found" required onchange="selectType('found')">
+        <span class="t-icon">🙌</span>
+        <span class="t-title">I Found Something</span>
+        <span class="t-desc">Post about something you've found and want to return</span>
+      </label>
+    </div>
+
+    <!-- ITEM DETAILS -->
+    <div class="form-card fade-up">
+      <h2>📋 Item Details</h2>
+
+      <div class="form-group">
+        <label for="title">Item Title <span style="color:#e88;">*</span></label>
+        <input type="text" name="title" id="title" placeholder="e.g. Blue Casio watch, Black Dell laptop bag" required maxlength="120">
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label for="category">Category <span style="color:#e88;">*</span></label>
+          <select name="category" id="category" required>
+            <option value="" disabled selected>Select a category</option>
+            {% for cat in categories %}
+              <option value="{{ cat }}">{{ cat }}</option>
+            {% endfor %}
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="location">Location <span style="color:#e88;">*</span></label>
+          <select name="location" id="location" required>
+            <option value="" disabled selected>Where was it?</option>
+            {% for loc in locations %}
+              <option value="{{ loc }}">{{ loc }}</option>
+            {% endfor %}
+          </select>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="description">Description <span style="color:#e88;">*</span></label>
+        <textarea name="description" id="description" rows="4"
+          placeholder="Describe the item in detail — color, brand, any distinguishing features, when/where exactly…"
+          required></textarea>
+      </div>
+
+      <!-- IMAGE UPLOAD -->
+      <div class="form-group">
+        <label>Photo (optional)</label>
+        <div class="upload-zone" id="upload-zone">
+          <input type="file" name="image" id="image-input" accept="image/*" onchange="previewImage(this)">
+          <span class="upload-icon">📷</span>
+          <div class="upload-label">Click to upload a photo</div>
+          <div class="upload-hint">PNG, JPG, WEBP up to 5MB</div>
+        </div>
+        <div id="preview-wrap">
+          <img id="preview-img" alt="Preview">
+          <button type="button" onclick="clearImage()"
+            style="display:block;margin-top:6px;font-size:0.8rem;color:#e88;background:none;border:none;cursor:pointer;padding:0">
+            ✕ Remove photo
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- CONTACT -->
+    <div class="form-card fade-up">
+      <h2>📬 Contact Information</h2>
+      <p style="font-size:.85rem;color:var(--ink-soft);margin-bottom:1.25rem">
+        This will be visible to others so they can reach you about the item.
+      </p>
+      <div class="form-row">
+        <div class="form-group">
+          <label for="contact_name">Your Name <span style="color:#e88;">*</span></label>
+          <input type="text" name="contact_name" id="contact_name" placeholder="e.g. Priya S." required maxlength="80">
+        </div>
+        <div class="form-group">
+          <label for="contact_info">Phone / Email <span style="color:#e88;">*</span></label>
+          <input type="text" name="contact_info" id="contact_info" placeholder="e.g. 9876543210 or priya@college.edu" required maxlength="120">
+        </div>
+      </div>
+    </div>
+
+    <!-- TIPS -->
+    <div class="tips-box fade-up">
+      <h3>💡 Tips for a good post</h3>
+      <ul>
+        <li>Include specific details like color, brand name, or unique marks</li>
+        <li>Mention the exact spot — "near the east entrance of the library"</li>
+        <li>Add a photo if possible — it helps a lot!</li>
+        <li>Double-check your contact info is correct</li>
+      </ul>
+    </div>
+
+    <!-- SUBMIT -->
+    <div class="submit-row fade-up">
+      <p class="submit-note">By posting, you agree that your contact info will be visible to other students.</p>
+      <button type="submit" class="btn-submit" id="submit-btn">
+        <span>Post Item</span> →
+      </button>
+    </div>
+  </form>
+</div>
+
+<script>
+  function selectType(type) {
+    document.getElementById('card-lost').classList.remove('selected-lost','selected-found');
+    document.getElementById('card-found').classList.remove('selected-lost','selected-found');
+    document.getElementById('card-' + type).classList.add('selected-' + type);
+  }
+
+  function previewImage(input) {
+    const zone = document.getElementById('upload-zone');
+    const wrap = document.getElementById('preview-wrap');
+    const img  = document.getElementById('preview-img');
+    if (input.files && input.files[0]) {
+      const reader = new FileReader();
+      reader.onload = e => {
+        img.src = e.target.result;
+        wrap.style.display = 'block';
+        zone.classList.add('has-file');
+      };
+      reader.readAsDataURL(input.files[0]);
+    }
+  }
+
+  function clearImage() {
+    document.getElementById('image-input').value = '';
+    document.getElementById('preview-wrap').style.display = 'none';
+    document.getElementById('preview-img').src = '';
+    document.getElementById('upload-zone').classList.remove('has-file');
+  }
+
+  document.getElementById('post-form').addEventListener('submit', function() {
+    const btn = document.getElementById('submit-btn');
+    btn.disabled = true;
+    btn.innerHTML = '<span>Posting…</span>';
+  });
+</script>
+{% endblock %}

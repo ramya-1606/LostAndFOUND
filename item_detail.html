@@ -1,0 +1,170 @@
+{% extends "base.html" %}
+{% block title %}{{ item['title'] }} — FindIt{% endblock %}
+
+{% block head %}
+<style>
+  .back-link {
+    display: inline-flex; align-items: center; gap: 6px;
+    color: var(--ink-soft); text-decoration: none;
+    font-size: 0.88rem; font-weight: 500; margin-bottom: 1.5rem;
+    transition: color .2s;
+  }
+  .back-link:hover { color: var(--ink); }
+
+  .detail-grid {
+    display: grid; grid-template-columns: 1fr 1.1fr; gap: 2rem; align-items: start;
+  }
+  @media(max-width: 680px) { .detail-grid { grid-template-columns: 1fr; } }
+
+  /* IMAGE PANEL */
+  .detail-image {
+    border-radius: var(--radius-lg); overflow: hidden;
+    border: 1.5px solid var(--border); background: var(--surface);
+    aspect-ratio: 1; display: flex; align-items: center;
+    justify-content: center; font-size: 6rem; box-shadow: var(--shadow);
+  }
+  .detail-image img { width: 100%; height: 100%; object-fit: cover; }
+
+  /* INFO PANEL */
+  .detail-info {}
+  .detail-badges { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 1rem; }
+  .detail-title {
+    font-family: 'Fraunces', serif;
+    font-size: clamp(1.6rem, 4vw, 2.2rem);
+    font-weight: 600; line-height: 1.2; margin-bottom: 1rem;
+  }
+  .detail-desc {
+    color: var(--ink-soft); line-height: 1.75; margin-bottom: 1.5rem;
+    font-size: 0.97rem;
+  }
+
+  /* META TABLE */
+  .meta-table { margin-bottom: 1.5rem; display: flex; flex-direction: column; gap: 10px; }
+  .meta-row {
+    display: flex; align-items: flex-start; gap: 12px;
+    padding: 10px 14px; background: var(--surface);
+    border: 1.5px solid var(--border); border-radius: var(--radius-sm);
+  }
+  .meta-icon { font-size: 1.1rem; flex-shrink: 0; margin-top: 1px; }
+  .meta-content {}
+  .meta-label { font-size: 0.72rem; font-weight: 600; color: var(--ink-soft); text-transform: uppercase; letter-spacing: .04em; }
+  .meta-value { font-size: 0.92rem; font-weight: 500; margin-top: 1px; }
+
+  /* CONTACT BOX */
+  .contact-box {
+    background: var(--lavender); border: 1.5px solid var(--lavender);
+    border-radius: var(--radius-md); padding: 1.25rem 1.5rem;
+    margin-bottom: 1.5rem;
+  }
+  .contact-box h3 { font-weight: 700; margin-bottom: .5rem; font-size: 0.95rem; }
+  .contact-name { font-size: 1rem; font-weight: 600; }
+  .contact-info { font-size: 0.9rem; color: var(--ink-soft); margin-top: 4px; }
+
+  /* ACTIONS */
+  .detail-actions { display: flex; flex-direction: column; gap: 10px; }
+  .token-box {
+    background: var(--butter); border: 1.5px solid #e5d56a;
+    border-radius: var(--radius-sm); padding: 1rem 1.25rem;
+    font-size: 0.85rem;
+  }
+  .token-box strong { display: block; margin-bottom: 6px; }
+  .token-code {
+    font-family: monospace; background: white;
+    padding: 6px 10px; border-radius: 6px;
+    border: 1px solid #ddd; font-size: 0.8rem;
+    word-break: break-all; display: block; margin-top: 4px;
+  }
+
+  .resolved-banner {
+    background: var(--mint); border: 1.5px solid var(--mint-deep);
+    border-radius: var(--radius-md); padding: 1rem 1.5rem;
+    text-align: center; font-weight: 600; color: #1e5c38;
+    font-size: 1.05rem;
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<a href="{{ url_for('items') }}" class="back-link fade-up">← Back to listings</a>
+
+<div class="detail-grid fade-up">
+  <!-- IMAGE -->
+  <div class="detail-image">
+    {% if item['image_filename'] %}
+      <img src="{{ url_for('static', filename='uploads/' + item['image_filename']) }}" alt="{{ item['title'] }}">
+    {% else %}
+      {{ {'Electronics':'📱','Clothing & Accessories':'👗','ID Cards & Documents':'🪪','Keys':'🔑','Bags & Wallets':'👝','Books & Stationery':'📚','Sports Equipment':'⚽','Other':'📦'}.get(item['category'], '📦') }}
+    {% endif %}
+  </div>
+
+  <!-- INFO -->
+  <div class="detail-info">
+    <div class="detail-badges">
+      <span class="badge badge-{{ item['type'] }}">{{ item['type']|capitalize }}</span>
+      <span class="badge badge-{{ item['status'] }}">{{ item['status']|capitalize }}</span>
+    </div>
+
+    <h1 class="detail-title">{{ item['title'] }}</h1>
+    <p class="detail-desc">{{ item['description'] }}</p>
+
+    <div class="meta-table">
+      <div class="meta-row">
+        <div class="meta-icon">📍</div>
+        <div class="meta-content">
+          <div class="meta-label">Location</div>
+          <div class="meta-value">{{ item['location'] }}</div>
+        </div>
+      </div>
+      <div class="meta-row">
+        <div class="meta-icon">🏷️</div>
+        <div class="meta-content">
+          <div class="meta-label">Category</div>
+          <div class="meta-value">{{ item['category'] }}</div>
+        </div>
+      </div>
+      <div class="meta-row">
+        <div class="meta-icon">📅</div>
+        <div class="meta-content">
+          <div class="meta-label">Reported</div>
+          <div class="meta-value">{{ item['date_display'] }}</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="contact-box">
+      <h3>📬 Contact to claim</h3>
+      <div class="contact-name">{{ item['contact_name'] }}</div>
+      <div class="contact-info">{{ item['contact_info'] }}</div>
+    </div>
+
+    <div class="detail-actions">
+      {% if item['status'] == 'resolved' %}
+        <div class="resolved-banner">🎉 This item has been reunited with its owner!</div>
+        {% if is_owner %}
+          <form method="post" action="{{ url_for('reopen_item', item_id=item['id']) }}">
+            <input type="hidden" name="token" value="{{ token }}">
+            <button type="submit" class="btn btn-ghost" style="width:100%">Reopen listing</button>
+          </form>
+        {% endif %}
+      {% else %}
+        {% if is_owner %}
+          <form method="post" action="{{ url_for('resolve_item', item_id=item['id']) }}"
+                onsubmit="return confirm('Mark this item as resolved?')">
+            <input type="hidden" name="token" value="{{ token }}">
+            <button type="submit" class="btn btn-success" style="width:100%">✓ Mark as Resolved</button>
+          </form>
+          <div class="token-box">
+            <strong>🔐 Your secret edit link</strong>
+            Bookmark this page URL — it lets you resolve or reopen this item.
+            <span class="token-code">{{ request.url }}</span>
+          </div>
+        {% else %}
+          <p style="font-size:.82rem; color:var(--ink-soft); text-align:center">
+            Only the person who posted this can mark it as resolved.
+          </p>
+        {% endif %}
+      {% endif %}
+    </div>
+  </div>
+</div>
+{% endblock %}
