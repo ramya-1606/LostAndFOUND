@@ -198,7 +198,8 @@ def reopen_item(item_id):
     flash('Item reopened.', 'success')
     return redirect(url_for('item_detail', item_id=item_id, token=token))
 
-@app.before_first_request
-def setup():
+app = Flask(__name__)
+
+with app.app_context():
     init_db()
     
